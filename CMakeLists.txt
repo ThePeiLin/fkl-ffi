@@ -1,0 +1,27 @@
+cmake_minimum_required(VERSION 3.18)
+
+#warnnig setting
+if(MSVC)
+	add_compile_options(/W4)
+else()
+	add_compile_options(-Wall)# -fsanitize=thread)
+endif()
+set(CMAKE_C_STANDARD 11)
+
+if(WIN32)
+	set(LINK_TARGET m pthread)
+else()
+	set(LINK_TARGET m pthread dl)# tsan)
+endif()
+
+set(FFI_TARGET_NAME fklffi)
+
+file(GLOB FFI_SOURCE "c/*.c")
+
+#fklffi.so
+add_library(${FFI_TARGET_NAME}
+	MODULE
+	${FFI_SOURCE})
+set_target_properties(${FFI_TARGET_NAME} PROPERTIES PREFIX "")
+
+target_link_libraries(${FFI_TARGET_NAME} ${LIBFKL_TARGET_NAME} ffi)
