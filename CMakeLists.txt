@@ -16,7 +16,12 @@ endif()
 
 set(FFI_TARGET_NAME fklffi)
 
+project(${FFI_TARGET_NAME})
 file(GLOB FFI_SOURCE "c/*.c")
+
+add_subdirectory(fakeLisp)
+
+include_directories("${PROJECT_SOURCE_DIR}/fakeLisp/include")
 
 #fklffi.so
 add_library(${FFI_TARGET_NAME}
