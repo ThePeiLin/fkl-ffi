@@ -13,6 +13,21 @@ make
 (import (path to fklffi))
 (import (path to lib utils))
 
+(defmacro (ffi-deftype type alias)
+  `(ffi-typedef '~type '~alias))
+
+(defmacro (ffi-path-ref path mem,index)
+  (begin
+    (define iter
+      (lambda [c r]
+        (cond
+          [c (iter (cdr c)
+                   `(ffi-ref ~r (quote ~(car c))))]
+          [1 r])))
+    `(ffi-ref ~(iter path mem) '() ~@index)))
+(defmacro (ffi-procedure sym arg-types,rtypes)
+  `(ffi-proc ~sym (quote (function ~arg-types ~@rtypes))))
+
 (ffi-typedef
   '(struct
      LinkNode
