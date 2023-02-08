@@ -29,4 +29,4 @@ add_library(${FFI_TARGET_NAME}
 	${FFI_SOURCE})
 set_target_properties(${FFI_TARGET_NAME} PROPERTIES PREFIX "")
 
-target_link_libraries(${FFI_TARGET_NAME} ${LIBFKL_TARGET_NAME} ffi)
+target_link_libraries(${FFI_TARGET_NAME} fkl ffi)
