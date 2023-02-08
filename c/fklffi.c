@@ -182,7 +182,7 @@ void ffi_load(ARGL)
 	if(!FKL_IS_STR(vpath))
 		FKL_RAISE_BUILTIN_ERROR_CSTR("ffi.load",FKL_ERR_INCORRECT_TYPE_VALUE,exe);
 	char* path=fklCharBufToCstr(vpath->u.str->str,vpath->u.str->size);
-	FklVMdllHandle handle=fklLoadDll(path);
+	FklDllHandle handle=fklLoadDll(path);
 	if(!handle)
 		FKL_RAISE_BUILTIN_INVALIDSYMBOL_ERROR_CSTR("ffi.load",path,1,FKL_ERR_LOADDLLFAILD,exe);
 	free(path);
