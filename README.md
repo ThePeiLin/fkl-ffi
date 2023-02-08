@@ -10,7 +10,7 @@ make
 
 ### 示例
 ```scheme
-(import (path to fkl-ffi))
+(import (path to fklffi))
 (import (path to lib utils))
 
 (ffi-typedef

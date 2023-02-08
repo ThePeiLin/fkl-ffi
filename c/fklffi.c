@@ -4,7 +4,6 @@
 #include"fklffitype.h"
 #include"fklffimem.h"
 #include"fklffidll.h"
-#define ARGL FklVM* exe,FklVMvalue* rel,FklVMvalue* pd
 
 #define PREDICATE(condtion,err_infor) {\
 	FKL_NI_BEGIN(exe);\
@@ -20,11 +19,11 @@
 	fklNiEnd(&ap,stack);\
 }
 
-void ffi_mem_p(ARGL) PREDICATE(fklFfiIsMem(val),"ffi.mem?")
+void fkl_ffi_mem_p(FKL_DL_PROC_ARGL) PREDICATE(fklFfiIsMem(val),"ffi.mem?")
 
 #undef PREDICATE
 
-void ffi_null_p(ARGL)
+void fkl_ffi_null_p(FKL_DL_PROC_ARGL)
 {
 	FKL_NI_BEGIN(exe);
 	FklVMvalue* val=fklNiGetArg(&ap,stack);
@@ -41,7 +40,7 @@ void ffi_null_p(ARGL)
 	fklNiEnd(&ap,stack);
 }
 
-void ffi_new(ARGL)
+void fkl_ffi_new(FKL_DL_PROC_ARGL)
 {
 	FKL_NI_BEGIN(exe);
 	FklVMvalue* typedeclare=fklNiGetArg(&ap,stack);
@@ -81,7 +80,7 @@ void ffi_new(ARGL)
 	fklNiEnd(&ap,stack);
 }
 
-void ffi_delete(ARGL)
+void fkl_ffi_delete(FKL_DL_PROC_ARGL)
 {
 	FKL_NI_BEGIN(exe);
 	FklVMvalue* mem=fklNiGetArg(&ap,stack);
@@ -98,7 +97,7 @@ void ffi_delete(ARGL)
 	fklNiEnd(&ap,stack);
 }
 
-void ffi_sizeof(ARGL)
+void fkl_ffi_sizeof(FKL_DL_PROC_ARGL)
 {
 	FKL_NI_BEGIN(exe);
 	FklVMvalue* typedeclare=fklNiGetArg(&ap,stack);
@@ -124,7 +123,7 @@ void ffi_sizeof(ARGL)
 	fklNiEnd(&ap,stack);
 }
 
-void ffi_alignof(ARGL)
+void fkl_ffi_alignof(FKL_DL_PROC_ARGL)
 {
 	FKL_NI_BEGIN(exe);
 	FklVMvalue* typedeclare=fklNiGetArg(&ap,stack);
@@ -150,7 +149,7 @@ void ffi_alignof(ARGL)
 	fklNiEnd(&ap,stack);
 }
 
-void ffi_typedef(ARGL)
+void fkl_ffi_typedef(FKL_DL_PROC_ARGL)
 {
 	FKL_NI_BEGIN(exe);
 	FklVMvalue* typedeclare=fklNiGetArg(&ap,stack);
@@ -171,7 +170,7 @@ void ffi_typedef(ARGL)
 	fklNiEnd(&ap,stack);
 }
 
-void ffi_load(ARGL)
+void fkl_ffi_load(FKL_DL_PROC_ARGL)
 {
 	FKL_NI_BEGIN(exe);
 	FklVMvalue* vpath=fklNiGetArg(&ap,stack);
@@ -192,7 +191,7 @@ void ffi_load(ARGL)
 	fklNiEnd(&ap,stack);
 }
 
-void ffi_ref(ARGL)
+void fkl_ffi_ref(FKL_DL_PROC_ARGL)
 {
 	FKL_NI_BEGIN(exe);
 	FklVMvalue* mem=fklNiGetArg(&ap,stack);
@@ -216,7 +215,7 @@ void ffi_ref(ARGL)
 	fklNiEnd(&ap,stack);
 }
 
-void ffi_clear(ARGL)
+void fkl_ffi_clear(FKL_DL_PROC_ARGL)
 {
 	FKL_NI_BEGIN(exe);
 	FklVMvalue* mem=fklNiGetArg(&ap,stack);
@@ -238,7 +237,7 @@ void ffi_clear(ARGL)
 	fklNiEnd(&ap,stack);
 }
 
-void ffi_cast_ref(ARGL)
+void fkl_ffi_cast_ref(FKL_DL_PROC_ARGL)
 {
 	FKL_NI_BEGIN(exe);
 	FklVMvalue* type=fklNiGetArg(&ap,stack);
@@ -262,7 +261,7 @@ void ffi_cast_ref(ARGL)
 	fklNiEnd(&ap,stack);
 }
 
-void ffi_set(ARGL)
+void fkl_ffi_set(FKL_DL_PROC_ARGL)
 {
 	FKL_NI_BEGIN(exe);
 	FklVMvalue* ref=fklNiGetArg(&ap,stack);
@@ -281,7 +280,7 @@ void ffi_set(ARGL)
 	fklNiEnd(&ap,stack);
 }
 
-void ffi_mem(ARGL)
+void fkl_ffi_mem(FKL_DL_PROC_ARGL)
 {
 	FKL_NI_BEGIN(exe);
 	FklVMvalue* val=fklNiGetArg(&ap,stack);
@@ -295,7 +294,7 @@ void ffi_mem(ARGL)
 	fklNiEnd(&ap,stack);
 }
 
-void ffi_val(ARGL)
+void fkl_ffi_val(FKL_DL_PROC_ARGL)
 {
 	FKL_NI_BEGIN(exe);
 	FklVMvalue* mem=fklNiGetArg(&ap,stack);
@@ -309,7 +308,7 @@ void ffi_val(ARGL)
 	fklNiEnd(&ap,stack);
 }
 
-void ffi_proc(ARGL)
+void fkl_ffi_proc(FKL_DL_PROC_ARGL)
 {
 	FKL_NI_BEGIN(exe);
 	FklVMvalue* val=fklNiGetArg(&ap,stack);
@@ -350,7 +349,7 @@ static FklFfiPublicData* createFfiPd(void)
 	return pd;
 }
 
-static void ffi_pd_finalizer(void* data)
+static void fkl_ffi_pd_finalizer(void* data)
 {
 	FklFfiPublicData* pd=data;
 	fklFfiDestroyGlobDefTypeTable(pd);
@@ -368,7 +367,7 @@ static FklVMudMethodTable pdtable=
 	.__equal=NULL,
 	.__prin1=NULL,
 	.__princ=NULL,
-	.__finalizer=ffi_pd_finalizer,
+	.__finalizer=fkl_ffi_pd_finalizer,
 };
 
 void _fklInit(FklVMdll* rel,FklVM* exe)
@@ -383,4 +382,56 @@ void _fklInit(FklVMdll* rel,FklVM* exe)
 	FklVMvalue* ud=fklCreateVMvalueToStack(FKL_TYPE_USERDATA,fklCreateVMudata(0,&pdtable,pd,FKL_VM_NIL,FKL_VM_NIL),exe);
 	fklSetRef(&rel->pd,ud,gc);
 }
-#undef ARGL
+
+struct SymFunc
+{
+	const char* sym;
+	FklVMdllFunc f;
+};
+
+static const struct SymFunc
+exports[]=
+{
+	{"ffi-mem?",     fkl_ffi_mem_p,    },
+	{"ffi-null?",    fkl_ffi_null_p,   },
+	{"ffi-new",      fkl_ffi_new,      },
+	{"ffi-delete",   fkl_ffi_delete,   },
+	{"ffi-sizeof",   fkl_ffi_sizeof,   },
+	{"ffi-alignof",  fkl_ffi_alignof,  },
+	{"ffi-typedef",  fkl_ffi_typedef,  },
+	{"ffi-load",     fkl_ffi_load,     },
+	{"ffi-ref",      fkl_ffi_ref,      },
+	{"ffi-set!",     fkl_ffi_set,      },
+	{"ffi-cast-ref", fkl_ffi_cast_ref, },
+	{"ffi-mem",      fkl_ffi_mem,      },
+	{"ffi-val",      fkl_ffi_val,      },
+	{"ffi-proc",     fkl_ffi_proc,     },
+	{"ffi-clear!",   fkl_ffi_clear,    },
+};
+
+static const size_t EXPORT_NUM=sizeof(exports)/sizeof(struct SymFunc);
+
+void _fklExportSymbolInit(size_t* pnum,FklSid_t** psyms,FklSymbolTable* table)
+{
+	*pnum=EXPORT_NUM;
+	FklSid_t* symbols=(FklSid_t*)malloc(sizeof(FklSid_t)*EXPORT_NUM);
+	FKL_ASSERT(symbols);
+	for(size_t i=0;i<EXPORT_NUM;i++)
+		symbols[i]=fklAddSymbolCstr(exports[i].sym,table)->id;
+	*psyms=symbols;
+}
+
+void _fklImportInit(FklVM* exe,FklVMvalue* dll,FklVMvalue* env)
+{
+	FklSymbolTable* table=exe->symbolTable;
+	FklVMenv* e=env->u.env;
+	for(size_t i=0;i<EXPORT_NUM;i++)
+	{
+		FklSid_t id=fklAddSymbolCstr(exports[i].sym,table)->id;
+		FklVMdllFunc func=exports[i].f;
+		FklVMdlproc* proc=fklCreateVMdlproc(func,dll,dll->u.dll->pd);
+		proc->sid=id;
+		FklVMvalue* dlproc=fklCreateVMvalueToStack(FKL_TYPE_DLPROC,proc,exe);
+		fklFindOrAddVarWithValue(id,dlproc,e);
+	}
+}
