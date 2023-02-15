@@ -1,6 +1,6 @@
 fakeLisp的ffi扩展库，编译需要libffi
 
-### 构建
+### 构建（需要libffi）
 ```sh
 mkdir build
 cd build
