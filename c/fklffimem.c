@@ -321,7 +321,7 @@ static int fkl_ffi_mem_cmp_VU(FklVMvalue* a,FklFfiMem* b,int* isUnableToBeCmp)
 		else
 			return 0;
 	}
-	else if(fklIsFixint(a))
+	else if(FKL_IS_FIX(a))
 	{
 		int64_t ai=fklGetInt(a);
 		int64_t bi=__ffiGetIntegerFuncList[b->type](b);
@@ -866,15 +866,15 @@ FklVMudata* fklFfiCastVMvalueIntoMem(FklVMvalue* v
 	FklFfiPublicData* publicData=pd->u.ud->data;
 	FklFfiMem* m=NULL;
 	FklVMudata* r=NULL;
-	if(FKL_IS_I32(v))
-	{
-		m=fklFfiCreateMem(FKL_FFI_TYPE_INT32_T,sizeof(void*),pd);
-		*(int32_t*)m->mem=FKL_GET_I32(v);
-	}
-	else if(FKL_IS_I64(v))
+	if(FKL_IS_FIX(v))
 	{
 		m=fklFfiCreateMem(FKL_FFI_TYPE_INT64_T,sizeof(void*),pd);
-		*(int64_t*)m->mem=v->u.i64;
+		*(int64_t*)m->mem=FKL_GET_FIX(v);
+	}
+	else if(FKL_IS_BIG_INT(v)&&fklIsGeLeI64BigInt(v->u.bigInt))
+	{
+		m=fklFfiCreateMem(FKL_FFI_TYPE_INT64_T,sizeof(void*),pd);
+		*(int64_t*)m->mem=fklBigIntToI64(v->u.bigInt);
 	}
 	else if(FKL_IS_F64(v))
 	{

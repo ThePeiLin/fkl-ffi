@@ -139,7 +139,7 @@ static void ffiproc_frame_finalizer(void* data[6])
 	return;
 }
 
-static void ffiproc_frame_copy(void* const s[6],void* d[6],FklVM* exe)
+static void ffiproc_frame_copy(FklCallObjData d,const FklCallObjData s,FklVM* exe)
 {
 	FfiprocFrameContext* sc=(FfiprocFrameContext*)s;
 	FfiprocFrameContext* dc=(FfiprocFrameContext*)d;
