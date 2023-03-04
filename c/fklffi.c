@@ -421,10 +421,12 @@ void _fklExportSymbolInit(size_t* pnum,FklSid_t** psyms,FklSymbolTable* table)
 	*psyms=symbols;
 }
 
-void _fklImportInit(FklVM* exe,FklVMvalue* dll,FklVMvalue* env)
+FklVMvalue** _fklImportInit(FklVM* exe,FklVMvalue* dll,uint32_t* pcount)
 {
 	FklSymbolTable* table=exe->symbolTable;
-	FklVMenv* e=env->u.env;
+	*pcount=EXPORT_NUM;
+	FklVMvalue** loc=(FklVMvalue**)malloc(sizeof(FklVMvalue*)*EXPORT_NUM);
+	FKL_ASSERT(loc||!EXPORT_NUM);
 	for(size_t i=0;i<EXPORT_NUM;i++)
 	{
 		FklSid_t id=fklAddSymbolCstr(exports[i].sym,table)->id;
@@ -432,6 +434,8 @@ void _fklImportInit(FklVM* exe,FklVMvalue* dll,FklVMvalue* env)
 		FklVMdlproc* proc=fklCreateVMdlproc(func,dll,dll->u.dll->pd);
 		proc->sid=id;
 		FklVMvalue* dlproc=fklCreateVMvalueToStack(FKL_TYPE_DLPROC,proc,exe);
-		fklFindOrAddVarWithValue(id,dlproc,e);
+		loc[i]=dlproc;
 	}
+	return loc;
 }
+#undef EXPORT_NUM
