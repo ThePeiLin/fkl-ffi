@@ -356,6 +356,7 @@ inline void fklFfiInitProc(FklFfiProc* tmp,FklTypeId_t type,void* func,FklSid_t 
 	tmp->type=type;
 	tmp->func=func;
 	tmp->sid=sid;
+	tmp->pd=pd;
 	FKL_DECL_UD_DATA(publicData,FklFfiPublicData,pd->u.ud);
 	FklDefFuncType* ft=(FklDefFuncType*)FKL_GET_TYPES_PTR(fklFfiLockAndGetTypeUnion(type,publicData).all);
 	uint32_t anum=ft->anum;
