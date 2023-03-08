@@ -34,20 +34,15 @@ void fklFfiDestroyAllSharedObj(FklFfiPublicData* pd)
 	}
 }
 
-void fklFfiDestroyProc(FklFfiProc* t)
+static void _ffi_proc_atomic_finalizer(FklVMudata* p)
 {
+	FKL_DECL_UD_DATA(t,FklFfiProc,p);
 	free(t->atypes);
-	free(t);
 }
 
-static void _ffi_proc_atomic_finalizer(void* p)
+static void _ffi_proc_print(const FklVMudata* ud,FILE* fp,FklSymbolTable* table)
 {
-	fklFfiDestroyProc(p);
-}
-
-static void _ffi_proc_print(void* p,FILE* fp,FklSymbolTable* table,FklVMvalue* pd)
-{
-	FklFfiProc* f=p;
+	FKL_DECL_UD_DATA(f,FklFfiProc,ud);
 	fprintf(fp,"#<ffi-proc ");
 	fklPrintString(fklGetSymbolWithId(f->sid,table)->symbol,fp);
 	fputc('>',fp);
@@ -116,7 +111,7 @@ typedef struct
 static void ffiproc_frame_print_backtrace(void* data[6],FILE* fp,FklSymbolTable* table)
 {
 	FfiprocFrameContext* c=(FfiprocFrameContext*)data;
-	FklFfiProc* ffiproc=c->proc->u.ud->data;
+	FKL_DECL_UD_DATA(ffiproc,FklFfiProc,c->proc->u.ud);
 	if(ffiproc->sid)
 	{
 		fprintf(fp,"at ffi-proc:");
@@ -156,12 +151,12 @@ static int ffiproc_frame_end(void* data[6])
 
 static void _ffi_proc_invoke(FklFfiProc* proc
 		,FklVM* exe
-		,FklVMvalue* rel
-		,FklVMvalue* pdv)
+		,FklVMvalue* rel)
 {
 	FKL_NI_BEGIN(exe);
 	FklTypeId_t type=proc->type;
-	FklFfiPublicData* pd=pdv->u.ud->data;
+	FklVMvalue* pdv=proc->pd;
+	FKL_DECL_UD_DATA(pd,FklFfiPublicData,pdv->u.ud);
 	FklDefFuncType* ft=(FklDefFuncType*)FKL_GET_TYPES_PTR(fklFfiLockAndGetTypeUnion(type,pd).all);
 	uint32_t anum=ft->anum;
 	uint32_t i=0;
@@ -197,17 +192,15 @@ static void _ffi_proc_invoke(FklFfiProc* proc
 			for(uint32_t j=0;j<i;j++)
 			{
 				FklVMudata* tud=udataList[i];
-				tud->t->__finalizer(tud->data);
 				fklDestroyVMudata(tud);
 			}
-			ud->t->__finalizer(ud->data);
 			fklDestroyVMudata(ud);
 			free(args);
 			free(pArgs);
 			free(udataList);
 			FKL_RAISE_BUILTIN_ERROR(fklGetSymbolWithId(proc->sid,exe->symbolTable)->symbol,FKL_ERR_INCORRECT_TYPE_VALUE,exe);
 		}
-		FklFfiMem* mem=ud->data;
+		FKL_DECL_UD_DATA(mem,FklFfiMem,ud);
 		if(mem->type==FKL_FFI_TYPE_FILE_P||mem->type==FKL_FFI_TYPE_STRING||fklFfiIsArrayType(fklFfiLockAndGetTypeUnion(mem->type,pd)))
 			pArgs[i]=&mem->mem;
 		else
@@ -232,7 +225,6 @@ static void _ffi_proc_invoke(FklFfiProc* proc
 	for(i=0;i<anum;i++)
 	{
 		FklVMudata* ud=udataList[i];
-		ud->t->__finalizer(ud->data);
 		fklDestroyVMudata(ud);
 	}
 	free(udataList);
@@ -244,12 +236,12 @@ static void _ffi_proc_invoke(FklFfiProc* proc
 static void ffiproc_frame_step(void* data[6],FklVM* exe)
 {
 	FfiprocFrameContext* c=(FfiprocFrameContext*)data;
-	FklFfiProc* ffiproc=c->proc->u.ud->data;
+	FKL_DECL_UD_DATA(ffiproc,FklFfiProc,c->proc->u.ud);
 	switch(c->state)
 	{
 		case FFIPROC_READY:
 			c->state=FFIPROC_DONE;
-			_ffi_proc_invoke(ffiproc,exe,c->proc->u.ud->rel,c->proc->u.ud->pd);
+			_ffi_proc_invoke(ffiproc,exe,c->proc->u.ud->rel);
 			break;
 		case FFIPROC_DONE:
 			break;
@@ -266,18 +258,18 @@ static const FklVMframeContextMethodTable FfiprocContextMethodTable=
 	.step=ffiproc_frame_step,
 };
 
-inline static void initFfiprocFrameContext(void* data[6],FklVMvalue* proc,FklVMgc* gc)
+inline static void initFfiprocFrameContext(FklCallObjData data,FklVMvalue* proc,FklVMgc* gc)
 {
 	FfiprocFrameContext* c=(FfiprocFrameContext*)data;
 	fklSetRef(&c->proc,proc,gc);
 	c->state=FFIPROC_READY;
 }
 
-static void _ffi_call_proc(FklVMvalue* ffiproc,FklVM* exe)
+static void _ffi_call_proc(FklVMvalue* ud,FklVM* exe)
 {
 	FklVMframe* prev=exe->frames;
 	FklVMframe* f=fklCreateOtherObjVMframe(&FfiprocContextMethodTable,prev);
-	initFfiprocFrameContext(f->u.o.data,ffiproc,exe->gc);
+	initFfiprocFrameContext(f->u.o.data,ud,exe->gc);
 	fklPushVMframe(f,exe);
 }
 
@@ -287,8 +279,8 @@ int ffi_proc_equal(const FklVMudata* a,const FklVMudata* b)
 		return 0;
 	if(a->t->__call)
 	{
-		FklFfiProc* p0=a->data;
-		FklFfiProc* p1=b->data;
+		FKL_DECL_UD_DATA(p0,FklFfiProc,a);
+		FKL_DECL_UD_DATA(p1,FklFfiProc,b);
 		if(p0->type==p1->type&&p0->func==p1->func)
 			return 1;
 	}
@@ -337,14 +329,34 @@ int fklFfiIsValidFunctionType(FklDefTypeUnion tu,FklFfiPublicData* pd)
 	return 1;
 }
 
-FklFfiProc* fklFfiCreateProc(FklTypeId_t type,void* func,FklSid_t sid,FklVMvalue* pd)
+FklVMudata* fklFfiCreateProcUd(FklTypeId_t type
+		,const char* cStr
+		,FklVMvalue* rel
+		,FklVMvalue* pd
+		,FklSymbolTable* table)
 {
-	FklFfiProc* tmp=(FklFfiProc*)malloc(sizeof(FklFfiProc));
-	FKL_ASSERT(tmp);
+	FKL_DECL_UD_DATA(publicData,FklFfiPublicData,pd->u.ud);
+	void* address=NULL;
+	for(FklFfiSharedObjNode* head=publicData->sharedObjs;head;head=head->next)
+	{
+		address=fklGetAddress(cStr,head->dll);
+		if(address)
+			break;
+	}
+	if(!address)
+		return NULL;
+	FklVMudata* ud=fklCreateVMudata(publicData->memUdSid,&FfiProcMethodTable,rel,sizeof(FklFfiProc));
+	FKL_DECL_UD_DATA(ffiproc,FklFfiProc,ud);
+	fklFfiInitProc(ffiproc,type,address,fklAddSymbolCstr(cStr,table)->id,pd);
+	return ud;
+}
+
+inline void fklFfiInitProc(FklFfiProc* tmp,FklTypeId_t type,void* func,FklSid_t sid,FklVMvalue* pd)
+{
 	tmp->type=type;
 	tmp->func=func;
 	tmp->sid=sid;
-	FklFfiPublicData* publicData=pd->u.ud->data;
+	FKL_DECL_UD_DATA(publicData,FklFfiPublicData,pd->u.ud);
 	FklDefFuncType* ft=(FklDefFuncType*)FKL_GET_TYPES_PTR(fklFfiLockAndGetTypeUnion(type,publicData).all);
 	uint32_t anum=ft->anum;
 	FklTypeId_t* atypes=ft->atypes;
@@ -358,24 +370,4 @@ FklFfiProc* fklFfiCreateProc(FklTypeId_t type,void* func,FklSid_t sid,FklVMvalue
 	ffiRtype=fklFfiGetFfiType(rtype);
 	fklFfiPrepFFIcif(&tmp->cif,anum,ffiAtypes,ffiRtype);
 	tmp->atypes=ffiAtypes;
-	return tmp;
-}
-
-FklVMudata* fklFfiCreateProcUd(FklTypeId_t type
-		,const char* cStr
-		,FklVMvalue* rel
-		,FklVMvalue* pd
-		,FklSymbolTable* table)
-{
-	FklFfiPublicData* publicData=pd->u.ud->data;
-	void* address=NULL;
-	for(FklFfiSharedObjNode* head=publicData->sharedObjs;head;head=head->next)
-	{
-		address=fklGetAddress(cStr,head->dll);
-		if(address)
-			break;
-	}
-	if(!address)
-		return NULL;
-	return fklCreateVMudata(publicData->memUdSid,&FfiProcMethodTable,fklFfiCreateProc(type,address,fklAddSymbolCstr(cStr,table)->id,pd),rel,pd);
 }

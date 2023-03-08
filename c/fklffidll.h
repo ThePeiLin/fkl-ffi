@@ -9,13 +9,15 @@ extern "C" {
 #include<ffi.h>
 typedef struct FklFfiProc
 {
+	FklTypeId_t type;
+	FklSid_t sid;
+	FklVMvalue* pd;
 	void* func;
 	ffi_cif cif;
 	ffi_type** atypes;
-	FklTypeId_t type;
-	FklSid_t sid;
 }FklFfiProc;
 
+void fklFfiInitProc(FklFfiProc*,FklTypeId_t,void*,FklSid_t,FklVMvalue*);
 void fklFfiInitSharedObj(FklFfiPublicData*);
 int fklFfiIsProc(FklVMvalue*);
 void fklFfiDestroyAllSharedObj(FklFfiPublicData* pd);
@@ -25,10 +27,6 @@ FklVMudata* fklFfiCreateProcUd(FklTypeId_t id
 		,FklVMvalue*
 		,FklVMvalue* pd
 		,FklSymbolTable* table);
-FklFfiProc* fklFfiCreateProc(FklTypeId_t type
-		,void* func
-		,FklSid_t
-		,FklVMvalue*);
 int fklFfiIsValidFunctionType(FklDefTypeUnion type,FklFfiPublicData* pd);
 
 #ifdef __cplusplus
