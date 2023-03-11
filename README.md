@@ -13,21 +13,6 @@ make
 (import (path to fklffi))
 (import (path to lib utils))
 
-(defmacro (ffi-deftype type alias)
-  `(ffi-typedef '~type '~alias))
-
-(defmacro (ffi-path-ref path mem,index)
-  (begin
-    (define iter
-      (lambda [c r]
-        (cond
-          [c (iter (cdr c)
-                   `(ffi-ref ~r (quote ~(car c))))]
-          [1 r])))
-    `(ffi-ref ~(iter path mem) '() ~@index)))
-(defmacro (ffi-procedure sym arg-types,rtypes)
-  `(ffi-proc ~sym (quote (function ~arg-types ~@rtypes))))
-
 (ffi-typedef
   '(struct
      LinkNode
@@ -66,7 +51,7 @@ make
 
 (define ch (go traverse-link-node head))
 (recv ch)
-(princ #\\n)
+(newline)
 
 (let iter-print [(cur head)]
   (when (not (ffi-null? cur))
@@ -74,9 +59,9 @@ make
     (iter-print
       (ffi-path-ref (* next) cur))))
 
-(princ #\\n)
+(newline)
 (apply traverse-link-node head '())
-(princ #\\n)
+(newline)
 
 (let iter-free [(cur head)]
   (when (not (ffi-null? cur))
