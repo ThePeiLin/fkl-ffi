@@ -24,7 +24,7 @@ add_subdirectory(fakeLisp)
 include_directories("${PROJECT_SOURCE_DIR}/fakeLisp/include")
 
 #fklffi.so
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/ffi/bin)
 
 add_library(${FFI_TARGET_NAME}
 	MODULE
@@ -35,5 +35,5 @@ target_link_libraries(${FFI_TARGET_NAME} fkl ffi)
 
 #copy ffi.fkl
 add_custom_target(COPY_FFI_FKL ALL
-	COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/ffi.fkl ${CMAKE_BINARY_DIR})
+	COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/main.fkl ${CMAKE_BINARY_DIR}/ffi/)
 
