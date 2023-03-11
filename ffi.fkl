@@ -14,9 +14,9 @@
   ffi-cast-ref
   ffi-clear!
   ffi-proc
-  (defmacro (ffi-deftype type alias)
+  (defmacro ~(ffi-deftype ~type ~alias)
     `(ffi-typedef '~type '~alias))
-  (defmacro (ffi-path-ref path mem,index)
+  (defmacro ~(ffi-path-ref ~path ~mem,~index)
     (begin
       (define iter
         (lambda [c r]
@@ -25,7 +25,7 @@
                      `(ffi-ref ~r (quote ~(car c))))]
             [1 r])))
       `(ffi-ref ~(iter path mem) '() ~@index)))
-  (defmacro (ffi-procedure sym arg-types,rtypes)
+  (defmacro ~(ffi-procedure ~sym ~arg-types,~rtypes)
     `(ffi-proc ~sym (quote (function ~arg-types ~@rtypes)))))
 
 (import (bin fklffi))
