@@ -1,19 +1,6 @@
+(export (import (bin fklffi)))
+
 (export
-  ffi-mem?
-  ffi-null?
-  ffi-new
-  ffi-delete
-  ffi-sizeof
-  ffi-typedef
-  ffi-load
-  ffi-alignof
-  ffi-ref
-  ffi-set!
-  ffi-mem
-  ffi-val
-  ffi-cast-ref
-  ffi-clear!
-  ffi-proc
   (defmacro ~(ffi-deftype ~type ~alias)
     `(ffi-typedef '~type '~alias))
   (defmacro ~(ffi-path-ref ~path ~mem,~index)
@@ -27,6 +14,4 @@
       `(ffi-ref ~(iter path mem) '() ~@index)))
   (defmacro ~(ffi-procedure ~sym ~arg-types,~rtypes)
     `(ffi-proc ~sym (quote (function ~arg-types ~@rtypes)))))
-
-(import (bin fklffi))
 
